@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Consume</title>
+</head>
+<body>
+    <p>
+        About to try consuming some messages. Click on the button to pause/resume: <button id="controlBtn">Pause</button>
+    </p>
+
+    <p>
+        <ul id="results"></ul>
+        <li>^^^^ Results will appear here ^^^^</li>
+    </p>
+
+    <script>
+        function getMessages(){
+            var url = "/request-all";
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function(){
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
+                    var response = JSON.parse(xmlhttp.responseText);
+                    response.messages.forEach(function(message) {
+                        var listItem = document.createElement("li");
+                        listItem.innerHTML = message;
+                        document.getElementById("results").insertBefore(listItem, document.getElementById("results").firstElementChild)
+                    })
+                }
+            }
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+        }
+        window.onload = function() {
+            var interval = null;
+            interval = setInterval(getMessages, 700);
+
+            var controlBtn = document.getElementById("controlBtn");
+            controlBtn.onclick = function () {
+                if (interval === null) {
+                    interval = setInterval(getMessages, 700);
+                    controlBtn.innerHTML = "Pause";
+                } else {
+                    clearInterval(interval);
+                    interval = null;
+                    controlBtn.innerHTML = "Resume";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

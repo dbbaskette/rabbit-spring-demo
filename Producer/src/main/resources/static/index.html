@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Produce</title>
+</head>
+<body>
+    <p>
+        About to try sending some kinda message. Click on the button to pause/resume: <button id="controlBtn">Pause</button>
+    </p>
+    <p>
+        <ul id="results">
+            <li>^^^^ Results will appear here ^^^^</li>
+        </ul>
+    </p>
+
+    <script>
+        function sendMessage(message){
+            var url = "/produce-once";
+            var xmlhttp;
+            var urlWithParams = url + "?message=" + encodeURIComponent(message);
+            xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function(){
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
+                    var listItem = document.createElement("li");
+                    listItem.innerHTML = JSON.parse(xmlhttp.responseText).message;
+                    document.getElementById("results").insertBefore(listItem, document.getElementById("results").firstElementChild)
+                }
+            }
+            xmlhttp.open("GET", urlWithParams, true);
+            xmlhttp.send();
+        }
+        window.onload = function() {
+            var interval = null;
+            var message = 0;
+            var sendLatestMessage = function() {
+                sendMessage("" + (message++) + "        " + Date());
+                if (message === 50) {
+                    message = 0;
+                }
+            }
+            interval = setInterval(sendLatestMessage, 700);
+
+            var controlBtn = document.getElementById("controlBtn");
+            controlBtn.onclick = function () {
+                if (interval === null) {
+                    interval = setInterval(sendLatestMessage, 700);
+                    controlBtn.innerHTML = "Pause";
+                } else {
+                    clearInterval(interval);
+                    interval = null;
+                    controlBtn.innerHTML = "Resume";
+                }
+            }
+        }
+    </script>
+</body>
+</html>
